@@ -1,0 +1,135 @@
+
+# AI Learning Model: K-NN vs Decision Tree
+# Comparison using a Toy Dataset
+
+# Toy dataset
+# Features: [Study Hours, Attendance]
+# Target: Pass or Fail
+
+X = [
+    [1, 40],
+    [2, 45],
+    [3, 50],
+    [4, 60],
+    [5, 65],
+    [6, 70],
+    [7, 80],
+    [8, 85],
+    [9, 90],
+    [10, 95]
+]
+
+Y = [
+    "Fail", "Fail", "Fail", "Fail", "Pass",
+    "Pass", "Pass", "Pass", "Pass", "Pass"
+]
+
+# Split dataset into training and testing
+X_train = X[:8]
+Y_train = Y[:8]
+
+X_test = X[8:]
+Y_test = Y[8:]
+
+
+# -------------------------------
+# K-Nearest Neighbors Algorithm
+# -------------------------------
+
+def knn_predict(train_x, train_y, test_point, k=3):
+
+    distances = []
+
+    for i in range(len(train_x)):
+        distance = (
+            (train_x[i][0] - test_point[0]) ** 2 +
+            (train_x[i][1] - test_point[1]) ** 2
+        ) ** 0.5
+
+        distances.append((distance, train_y[i]))
+
+    distances.sort()
+
+    neighbors = distances[:k]
+
+    pass_count = sum(
+        1 for distance, label in neighbors
+        if label == "Pass"
+    )
+
+    fail_count = k - pass_count
+
+    return "Pass" if pass_count > fail_count else "Fail"
+
+
+# -------------------------------
+# Simple Decision Tree Algorithm
+# -------------------------------
+
+def decision_tree_predict(point):
+    study_hours, attendance = point
+
+    if study_hours >= 5 and attendance >= 65:
+        return "Pass"
+    else:
+        return "Fail"
+
+
+# -------------------------------
+# Prediction and Comparison
+# -------------------------------
+
+knn_predictions = []
+tree_predictions = []
+
+for point in X_test:
+
+    knn_result = knn_predict(
+        X_train, Y_train, point, k=3
+    )
+
+    tree_result = decision_tree_predict(point)
+
+    knn_predictions.append(knn_result)
+    tree_predictions.append(tree_result)
+
+
+# Calculate accuracy
+def accuracy(actual, predicted):
+
+    correct = 0
+
+    for i in range(len(actual)):
+        if actual[i] == predicted[i]:
+            correct += 1
+
+    return (correct / len(actual)) * 100
+
+
+knn_accuracy = accuracy(Y_test, knn_predictions)
+tree_accuracy = accuracy(Y_test, tree_predictions)
+
+
+# Display results
+print("====================================")
+print("     AI LEARNING MODEL")
+print("====================================")
+
+print("\nActual Results:", Y_test)
+
+print("\nK-NN Predictions:", knn_predictions)
+print("K-NN Accuracy:", knn_accuracy, "%")
+
+print("\nDecision Tree Predictions:", tree_predictions)
+print("Decision Tree Accuracy:", tree_accuracy, "%")
+
+print("\n========== MODEL COMPARISON ==========")
+
+if knn_accuracy > tree_accuracy:
+    print("K-NN performs better.")
+elif tree_accuracy > knn_accuracy:
+    print("Decision Tree performs better.")
+else:
+    print("Both models have equal accuracy.")
+
+print("\nProgram Completed Successfully!")
